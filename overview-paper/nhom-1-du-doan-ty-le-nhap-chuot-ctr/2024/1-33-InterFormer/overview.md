@@ -8,23 +8,27 @@
 
 ## 1. Paper này đang nghiên cứu gì?
 
-Cải thiện tích hợp các nguồn thông tin dị thể cho CTR prediction:
-- Tương tác giữa các loại dữ liệu không đủ do lưu lượng thông tin đơn hướng
-- Mất thông tin từ tổng hợp sớm
+InterFormer giải quyết hai vấn đề cốt lõi trong tích hợp dữ liệu heterogeneous cho CTR prediction. Thứ nhất, lưu lượng thông tin giữa các data modes (user profiles, behavior sequences, item features) là **unidirectional** — thông tin chỉ chảy một chiều, dẫn đến tương tác inter-mode không đủ. Thứ hai, **early aggregation** các nguồn dữ liệu heterogeneous gây mất thông tin nghiêm trọng — khi kết hợp sớm, chi tiết quan trọng từ từng mode bị loại bỏ trước khi model có cơ hội học tương tác phức tạp.
 
 ## 2. Phương pháp sử dụng
 
-- InterFormer module: bidirectional information flow giữa các mode
-- Separate bridging arch: lựa chọn và tóm tắt thông tin hiệu quả
-- Tránh tổng hợp sớm: duy trì thông tin đầy đủ trước tóm tắt chọn lọc
+**InterFormer module:**
+
+- **Bidirectional information flow**: Cho phép trao đổi thông tin hai chiều giữa các data modes — mỗi mode vừa gửi vừa nhận thông tin từ modes khác
+- **Separate bridging architecture**: Thay vì aggregate sớm, duy trì thông tin đầy đủ trong mỗi mode, sử dụng "cầu nối" riêng biệt để lựa chọn và tóm tắt thông tin hiệu quả
+- **Modified Transformer**: Hỗ trợ tương tác đa hướng, cho phép mỗi mode trích xuất thông tin liên quan từ modes khác mà không mất dữ liệu
+- Thiết kế bởi 28 tác giả từ hợp tác công nghiệp lớn — focus vào tính thực tiễn
 
 ## 3. Thành tựu đạt được
 
-- SOTA trên 3 public datasets + 1 industrial dataset
-- Giải quyết tương tác inter-mode không đủ
-- Giảm mất thông tin
+- **SOTA trên 3 public datasets + 1 industrial-scale dataset**
+- Giải quyết inter-mode interaction không đủ và information loss từ early aggregation
+- 28 tác giả từ các tổ chức công nghiệp lớn — chứng minh giá trị triển khai thực tế
+- Cải tiến đáng kể so với CTR methods hiện tại
 
 ## 4. Hạn chế
 
-- Độ phức tạp tính toán của bridging arch chưa được phân tích
-- Khả năng mở rộng đến hàng triệu user-item pairs chưa kiểm tra
+- Chi phí tính toán của bidirectional information exchange liên tục giữa modes chưa phân tích
+- Scalability trên datasets cực lớn với nhiều data modes chưa kiểm chứng
+- Thiếu so sánh trade-off giữa interaction depth và inference latency
+- Chi tiết kiến trúc bridging arch chưa làm rõ đầy đủ trong abstract

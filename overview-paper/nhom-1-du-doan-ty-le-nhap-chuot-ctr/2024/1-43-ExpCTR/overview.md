@@ -8,22 +8,28 @@
 
 ## 1. Paper này đang nghiên cứu gì?
 
-Giải quyết thiếu tính minh bạch trong quyết định hệ thống gợi ý:
-- Phương pháp post-hoc phải xây dựng dữ liệu đặc biệt, gây lo ngại độ tin cậy
+Bài báo giải quyết thiếu **tính minh bạch** trong hệ thống recommendation. Các phương pháp giải thích hiện tại là **post-hoc** — tạo giải thích sau khi model đã quyết định. Điều này gây 2 vấn đề: (1) độ tin cậy giải thích không đảm bảo vì giải thích có thể không phản ánh thực sự lý do model đưa ra quyết định, (2) cần nhiều nỗ lực thủ công xây dựng datasets giải thích. ExpCTR đề xuất tích hợp LLM-based explanation **trực tiếp vào quy trình prediction** thay vì post-hoc.
 
 ## 2. Phương pháp sử dụng
 
-- Tích hợp LLM trực tiếp vào quá trình dự đoán CTR (không post-hoc)
-- LC alignment: giải thích phản ánh ý định người dùng
-- IC alignment: nhất quán với mô hình CTR truyền thống
-- LoRA + quy trình 3 giai đoạn lặp lại
+**ExpCTR** sử dụng 3 cơ chế:
+
+- **LC Alignment Reward**: Đảm bảo giải thích phản ánh **user intent** — giải thích phải liên quan đến hành vi thực tế của user
+- **IC Alignment Reward**: Đảm bảo **nhất quán với CTR models truyền thống** dựa trên ID — giải thích không mâu thuẫn với prediction
+- **LoRA Training**: Điều chỉnh tham số LLM hiệu quả, không cần full fine-tuning
+- Quy trình **3 giai đoạn iterative**: Tối ưu hóa chung accuracy và explainability
+- Tránh yêu cầu datasets giải thích mở rộng — LLM tự generate explanations
 
 ## 3. Thành tựu đạt được
 
-- Cải thiện độ chính xác dự đoán & khả năng giải thích trên 3 dataset
-- Loại bỏ nhu cầu dataset giải thích mở rộng
+- Cải thiện đáng kể cả **prediction accuracy** lẫn **explainability** trên 3 real-world datasets
+- Loại bỏ nhu cầu xây dựng explanation datasets mở rộng
+- Tích hợp explanation vào prediction pipeline thay vì post-hoc
 
 ## 4. Hạn chế
 
-- Không nêu rõ hạn chế trong abstract
-- Latency & complexity của LLM reasoning ảnh hưởng CTR prediction
+- Thiếu con số định lượng (AUC, CTR lift, BLEU/ROUGE cho explanations)
+- **Latency** và complexity của LLM reasoning ảnh hưởng CTR prediction real-time
+- 3 iterative stages tốn computational resources đáng kể
+- Chưa có **human evaluation** xác thực chất lượng và trustworthiness explanations
+- Scalability trên domains ngoài e-commerce chưa kiểm tra

@@ -8,24 +8,29 @@
 
 ## 1. Paper này đang nghiên cứu gì?
 
-Cải thiện mô hình CTR bằng mutual learning thay vì knowledge distillation truyền thống:
-- Mô hình CTR thường không có sự chênh lệch hiệu suất lớn
-- Knowledge distillation kém hiệu quả khi mô hình cân bằng
+Bài báo lập luận rằng **Knowledge Distillation (KD) không hiệu quả cho CTR models** vì khoảng cách hiệu suất giữa teacher và student quá nhỏ. Trong CTR prediction, các mô hình phức tạp và đơn giản thường có performance gần nhau — không có teacher "giỏi hơn nhiều" để distill. Thay vì paradigm teacher-student truyền thống, tác giả đề xuất **mutual learning** — nhiều mô hình có khả năng tương đương học hỏi từ nhau đồng thời.
 
 ## 2. Phương pháp sử dụng
 
-- Mutual learning algorithms: huấn luyện cộng tác các mô hình tương tự
-- Các mô hình có độ phức tạp ngang bằng học từ nhau đồng thời
+**Mutual Learning Framework:**
+
+- Huấn luyện **song song nhiều mô hình cùng kích thước** nhưng khác về initialization hoặc hyperparameters
+- Các mô hình **chia sẻ gradient/loss từ nhau** để tối ưu hóa — peer-to-peer thay vì top-down
+- Không cần kiến trúc khác biệt đáng kể giữa các mô hình — tất cả đều là "peers" bình đẳng
+- Phương pháp đơn giản, dễ triển khai — không cần pre-train teacher model trước
 - Đánh giá trên Criteo và Avazu datasets
 
 ## 3. Thành tựu đạt được
 
-- Chứng minh mutual learning hiệu quả hơn khi mô hình cân bằng
-- ~0.66% relative improvement
-- Phương pháp đơn giản, dễ triển khai
+- Chứng minh mutual learning hiệu quả hơn KD khi models cân bằng
+- Cải thiện **~0.66% relative improvement** so với baselines
+- Phương pháp đơn giản, dễ tích hợp vào existing training pipelines
+- Kết quả nhất quán trên các CTR models phổ biến
 
 ## 4. Hạn chế
 
-- Báo cáo ngắn (7 trang)
-- Không rõ khả năng mở rộng, chi phí tính toán
-- Thiếu lý giải lý thuyết
+- Bài báo ngắn (**7 trang**) — thiếu khám phá sâu về khi nào mutual learning vượt trội
+- Mức cải thiện **0.66% khiêm tốn** — không chắc significant trong production systems
+- Chi phí memory **gấp đôi** do phải giữ nhiều models trong training
+- Thiếu so sánh với các techniques khác (mixup, regularization, data augmentation)
+- Thiếu lý giải lý thuyết vì sao mutual learning hoạt động tốt hơn

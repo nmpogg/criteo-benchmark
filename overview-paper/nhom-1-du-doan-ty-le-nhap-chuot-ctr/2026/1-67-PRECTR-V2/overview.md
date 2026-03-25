@@ -1,33 +1,49 @@
-# Review Paper: PRECTR-V2: Unified Relevance-CTR Framework with Cross-User Preference Mining, Exposure Bias Correction, and LLM-Distilled Encoder Optimization
+# Review Paper: PRECTR-V2 — Unified Relevance-CTR Framework with Cross-User Preference Mining, Exposure Bias Correction, and LLM-Distilled Encoder
 
-**ArXiv ID:** [2602.20676](https://arxiv.org/abs/2602.20676)
-**Năm:** 2026
-**Nhóm:** 1 - Dự đoán tỷ lệ nhấp chuột (CTR) — Kiến trúc mô hình
+**ArXiv:** [2602.20676](https://arxiv.org/abs/2602.20676) | **Năm:** 2026
+**Tác giả:** Shuzhi Cao, Rong Chen, Ailong He, Shuguang Han, Jufeng Chen
 
 ---
 
 ## 1. Paper này đang nghiên cứu gì?
 
-Phát triển PRECTR với focus trên coordinating search relevance matching và CTR prediction:
-- Sparse behavioral data cho low-activity users
-- Distribution mismatch giữa training và ranking data (exposure bias)
-- Architectural constraints từ frozen encoders (BERT)
+Paper là **phiên bản nâng cấp của PRECTR** (paper #68), tiếp tục nghiên cứu bài toán **kết hợp search relevance matching và CTR prediction** trong hệ thống tìm kiếm. Cụ thể, PRECTR-V2 giải quyết 3 hạn chế còn tồn tại từ PRECTR:
+
+- **Cold-start cho low-activity users:** Users mới hoặc ít tương tác thiếu dữ liệu hành vi, khiến việc personalize relevance gần như không thể. PRECTR gốc dựa trên behavioral data nên hoạt động kém với nhóm users này.
+- **Exposure bias:** Dữ liệu training chỉ chứa items đã được hệ thống hiển thị (high-relevance exposure), tạo phân bố lệch (distribution mismatch) so với toàn bộ candidate space. Mô hình học từ dữ liệu thiên lệch → dự đoán thiên lệch.
+- **Frozen BERT encoder:** PRECTR gốc sử dụng BERT pretrained nhưng đóng băng (frozen), không cho phép joint optimization giữa encoder và downstream tasks. Điều này giới hạn khả năng tinh chỉnh representations cho CTR cụ thể.
 
 ## 2. Phương pháp sử dụng
 
-- Cross-User Preference Mining: Mine global relevance preferences cho specific queries, enable cold-start personalization
-- Exposure Bias Correction: Constructing hard negative samples thông qua embedding noise injection và label reconstruction; optimize relative ranking via pairwise loss
-- LLM-Distilled Encoder: Pretrain lightweight transformer-based encoder thông qua knowledge distillation từ LLM, replace frozen BERT module
-- Joint optimization của representation learning và task-specific fine-tuning
+**PRECTR-V2 Framework** — 3 giải pháp cho 3 vấn đề:
+
+**1. Cross-User Preference Mining (giải quyết cold-start):**
+- Khai thác **global relevance preferences** từ toàn bộ users cho cùng một query
+- Khi user A mới và search "iPhone 16", hệ thống tham khảo preferences của hàng nghìn users khác đã search query tương tự
+- Cho phép cold-start personalization mà không cần behavioral data riêng
+
+**2. Exposure Bias Correction (giải quyết distribution mismatch):**
+- **Embedding noise injection:** Thêm nhiễu vào embedding space để tạo hard negative samples — items trông giống relevant nhưng thực tế không
+- **Label reconstruction:** Gán lại labels cho noisy samples
+- **Pairwise loss optimization:** Tối ưu relative ranking thay vì absolute scoring, giúp mô hình phân biệt tốt hơn giữa relevant/irrelevant items ở vùng ranh giới
+
+**3. LLM-Distilled Encoder (giải quyết frozen encoder):**
+- **Knowledge distillation từ LLM:** Pretrain một lightweight transformer encoder bằng cách "chưng cất" kiến thức từ LLM lớn
+- **SFT trên text relevance classification:** Fine-tune encoder trên task phân loại relevance
+- Thay thế hoàn toàn frozen BERT module, cho phép joint optimization end-to-end
+- Lightweight hơn BERT nhưng capture semantic knowledge từ LLM
 
 ## 3. Thành tựu đạt được
 
-- Vượt qua traditional Emb+MLP paradigm
-- Integration thành công của relevance và CTR objectives
-- Lightweight encoder thay thế BERT module giảm chi phí inference
+- **Vượt qua paradigm Emb+MLP truyền thống:** Unified framework tích hợp relevance + CTR hiệu quả hơn pipeline tách rời
+- **Giải quyết cold-start:** Cross-user mining cho phép phục vụ new/low-activity users mà PRECTR gốc không làm được
+- **Lightweight inference:** LLM-distilled encoder nhẹ hơn BERT nhưng mạnh hơn nhờ kiến thức từ LLM
+- **Systematic approach:** 3 vấn đề → 3 giải pháp tương ứng, dễ đánh giá đóng góp từng phần
 
 ## 4. Hạn chế
 
-- Submitted 02/2026 - chưa có kết quả numerical cụ thể trong abstract
-- Chưa có kết quả online A/B testing
-- Chưa public detailed performance metrics
+- **Thiếu numerical results** trong abstract — không báo cáo AUC, NDCG, hay bất kỳ metric định lượng nào
+- **Chưa có online A/B testing** — paper submitted 02/2026, có thể chưa kịp triển khai production
+- **Phụ thuộc vào LLM base:** Chất lượng distilled encoder phụ thuộc vào LLM được chọn để distill
+- **Noise injection strategy:** Việc tạo hard negatives qua embedding noise có thể không đại diện cho real distribution mismatch
+- **Chưa public benchmark:** Kết quả có thể chỉ trên proprietary datasets (tương tự PRECTR gốc)
