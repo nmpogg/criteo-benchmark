@@ -10,24 +10,24 @@
 
 | # | Paper | Year | ArXiv | Overview |
 |---|-------|------|-------|----------|
-| 1 | **Wide & Deep Learning** for Recommender Systems (Google) | 2016 | [1606.07792](https://arxiv.org/abs/1606.07792) | - |
-| 2 | **PNN**: Product-based Neural Networks | 2016 | [1611.00144](https://arxiv.org/abs/1611.00144) | - |
-| 3 | **DeepFM**: Factorization-Machine based Neural Network | 2017 | [1703.04247](https://arxiv.org/abs/1703.04247) | - |
-| 4 | **DCN**: Deep & Cross Network (Google) | 2017 | [1708.05123](https://arxiv.org/abs/1708.05123) | - |
-| 5 | **NFM**: Neural Factorization Machines | 2017 | [1708.05027](https://arxiv.org/abs/1708.05027) | - |
-| 6 | **AFM**: Attentional Factorization Machines | 2017 | [1708.04617](https://arxiv.org/abs/1708.04617) | - |
-| 7 | **xDeepFM**: Explicit and Implicit Feature Interactions | 2018 | [1803.05170](https://arxiv.org/abs/1803.05170) | - |
-| 8 | **AutoInt**: Feature Interaction via Self-Attention | 2019 | [1810.11921](https://arxiv.org/abs/1810.11921) | - |
-| 9 | **FGCNN**: Feature Generation by CNN for CTR | 2019 | [1904.04447](https://arxiv.org/abs/1904.04447) | - |
-| 10 | **FiBiNET**: Feature Importance and Bilinear Interaction | 2019 | [1905.09433](https://arxiv.org/abs/1905.09433) | - |
-| 11 | **DCN V2**: Improved Deep & Cross Network (Google) | 2020 | [2008.13535](https://arxiv.org/abs/2008.13535) | - |
-| 12 | Embedding Learning Framework for Numerical Features | 2020 | [2012.08986](https://arxiv.org/abs/2012.08986) | - |
-| 13 | **CAN**: Feature Co-Action for CTR Prediction | 2020 | [2011.05625](https://arxiv.org/abs/2011.05625) | - |
-| 14 | **GateNet**: Gating-Enhanced Deep Network for CTR | 2020 | [2007.03519](https://arxiv.org/abs/2007.03519) | - |
-| 15 | **DESTINE**: Disentangled Self-Attentive Neural Networks | 2021 | [2101.03654](https://arxiv.org/abs/2101.03654) | - |
-| 16 | **MaskNet**: Instance-Guided Mask for CTR Ranking | 2021 | [2102.07619](https://arxiv.org/abs/2102.07619) | - |
-| 17 | **DCAP**: Deep Cross Attentional Product Network | 2021 | [2105.08649](https://arxiv.org/abs/2105.08649) | - |
-| 18 | **GraphFM**: Graph Factorization Machines | 2021 | [2105.11866](https://arxiv.org/abs/2105.11866) | - |
+| 1 | **Wide & Deep Learning** for Recommender Systems (Google) | 2016 | [1606.07792](https://arxiv.org/abs/1606.07792) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2016/1-1-Wide-and-Deep/overview.md) |
+| 2 | **PNN**: Product-based Neural Networks | 2016 | [1611.00144](https://arxiv.org/abs/1611.00144) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2016/1-2-PNN/overview.md) |
+| 3 | **DeepFM**: Factorization-Machine based Neural Network | 2017 | [1703.04247](https://arxiv.org/abs/1703.04247) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2017/1-3-DeepFM/overview.md) |
+| 4 | **DCN**: Deep & Cross Network (Google) | 2017 | [1708.05123](https://arxiv.org/abs/1708.05123) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2017/1-4-DCN/overview.md) |
+| 5 | **NFM**: Neural Factorization Machines | 2017 | [1708.05027](https://arxiv.org/abs/1708.05027) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2017/1-5-NFM/overview.md) |
+| 6 | **AFM**: Attentional Factorization Machines | 2017 | [1708.04617](https://arxiv.org/abs/1708.04617) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2017/1-6-AFM/overview.md) |
+| 7 | **xDeepFM**: Explicit and Implicit Feature Interactions | 2018 | [1803.05170](https://arxiv.org/abs/1803.05170) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2018/1-7-xDeepFM/overview.md) |
+| 8 | **AutoInt**: Feature Interaction via Self-Attention | 2019 | [1810.11921](https://arxiv.org/abs/1810.11921) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2019/1-8-AutoInt/overview.md) |
+| 9 | **FGCNN**: Feature Generation by CNN for CTR | 2019 | [1904.04447](https://arxiv.org/abs/1904.04447) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2019/1-9-FGCNN/overview.md) |
+| 10 | **FiBiNET**: Feature Importance and Bilinear Interaction | 2019 | [1905.09433](https://arxiv.org/abs/1905.09433) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2019/1-10-FiBiNET/overview.md) |
+| 11 | **DCN V2**: Improved Deep & Cross Network (Google) | 2020 | [2008.13535](https://arxiv.org/abs/2008.13535) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2020/1-11-DCN-V2/overview.md) |
+| 12 | Embedding Learning Framework for Numerical Features | 2020 | [2012.08986](https://arxiv.org/abs/2012.08986) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2020/1-12-Numerical-Embedding/overview.md) |
+| 13 | **CAN**: Feature Co-Action for CTR Prediction | 2020 | [2011.05625](https://arxiv.org/abs/2011.05625) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2020/1-13-CAN/overview.md) |
+| 14 | **GateNet**: Gating-Enhanced Deep Network for CTR | 2020 | [2007.03519](https://arxiv.org/abs/2007.03519) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2020/1-14-GateNet/overview.md) |
+| 15 | **DESTINE**: Disentangled Self-Attentive Neural Networks | 2021 | [2101.03654](https://arxiv.org/abs/2101.03654) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2021/1-15-DESTINE/overview.md) |
+| 16 | **MaskNet**: Instance-Guided Mask for CTR Ranking | 2021 | [2102.07619](https://arxiv.org/abs/2102.07619) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2021/1-16-MaskNet/overview.md) |
+| 17 | **DCAP**: Deep Cross Attentional Product Network | 2021 | [2105.08649](https://arxiv.org/abs/2105.08649) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2021/1-17-DCAP/overview.md) |
+| 18 | **GraphFM**: Graph Factorization Machines | 2021 | [2105.11866](https://arxiv.org/abs/2105.11866) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2021/1-18-GraphFM/overview.md) |
 | 19 | **DAGFM**: Directed Acyclic Graph FM via KD | 2022 | [2211.11159](https://arxiv.org/abs/2211.11159) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2022/1-19-DAGFM/overview.md) |
 | 20 | **FRNet**: Context-Aware Feature Representation | 2022 | [2204.08758](https://arxiv.org/abs/2204.08758) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2022/1-20-FRNet/overview.md) |
 | 21 | CTR Prediction in Online Advertising: Literature Review | 2022 | [2202.10462](https://arxiv.org/abs/2202.10462) | [📄](nhom-1-du-doan-ty-le-nhap-chuot-ctr/2022/1-21-CTR-Literature-Review/overview.md) |
@@ -93,19 +93,19 @@
 
 | # | Paper | Year | ArXiv | Overview |
 |---|-------|------|-------|----------|
-| 1 | Tensorized Embeddings for Compact Rec Systems | 2019 | [1901.10787](https://arxiv.org/abs/1901.10787) | - |
-| 2 | Mixed Dimension Embedding with Feature Frequency | 2019 | [1909.11810](https://arxiv.org/abs/1909.11810) | - |
-| 3 | Compositional Embedding via Complementary Partitions | 2019 | [1909.02107](https://arxiv.org/abs/1909.02107) | - |
-| 4 | Memory-efficient Embedding for Recommendations | 2020 | [2006.14827](https://arxiv.org/abs/2006.14827) | - |
-| 5 | Learning to Embed without Embedding Tables | 2020 | [2010.10784](https://arxiv.org/abs/2010.10784) | - |
-| 6 | **DeepLight**: Deep Lightweight Feature Interactions | 2020 | [2002.06987](https://arxiv.org/abs/2002.06987) | - |
-| 7 | Ensembled CTR via Knowledge Distillation | 2020 | [2011.04106](https://arxiv.org/abs/2011.04106) | - |
-| 8 | **DPQ**: Differentiable Product Quantization (238x) | 2020 | [1908.09756](https://arxiv.org/abs/1908.09756) | - |
-| 9 | **ROBE**: Random Offset Block Embedding — 1000x | 2021 | [2108.02191](https://arxiv.org/abs/2108.02191) | - |
-| 10 | Learnable Embedding Sizes for Rec Systems | 2021 | [2101.07577](https://arxiv.org/abs/2101.07577) | - |
-| 11 | **TT-Rec**: Tensor Train Embedding (112-117x) | 2021 | [2101.11714](https://arxiv.org/abs/2101.11714) | - |
-| 12 | **Binary Code Hash Embedding** (1000x) | 2021 | [2109.02471](https://arxiv.org/abs/2109.02471) | - |
-| 13 | **HET**: Scaling Huge Embedding via Cache-enabled Distributed | 2021 | [2112.07221](https://arxiv.org/abs/2112.07221) | - |
+| 1 | Tensorized Embeddings for Compact Rec Systems | 2019 | [1901.10787](https://arxiv.org/abs/1901.10787) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2019/5-1-Tensorized-Embeddings/overview.md) |
+| 2 | Mixed Dimension Embedding with Feature Frequency | 2019 | [1909.11810](https://arxiv.org/abs/1909.11810) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2019/5-2-Mixed-Dimension-Embedding/overview.md) |
+| 3 | Compositional Embedding via Complementary Partitions | 2019 | [1909.02107](https://arxiv.org/abs/1909.02107) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2019/5-3-Compositional-Embedding/overview.md) |
+| 4 | Memory-efficient Embedding for Recommendations | 2020 | [2006.14827](https://arxiv.org/abs/2006.14827) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2020/5-4-Memory-efficient-Embedding/overview.md) |
+| 5 | Learning to Embed without Embedding Tables | 2020 | [2010.10784](https://arxiv.org/abs/2010.10784) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2020/5-5-Learning-to-Embed/overview.md) |
+| 6 | **DeepLight**: Deep Lightweight Feature Interactions | 2020 | [2002.06987](https://arxiv.org/abs/2002.06987) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2020/5-6-DeepLight/overview.md) |
+| 7 | Ensembled CTR via Knowledge Distillation | 2020 | [2011.04106](https://arxiv.org/abs/2011.04106) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2020/5-7-Ensembled-CTR-KD/overview.md) |
+| 8 | **DPQ**: Differentiable Product Quantization (238x) | 2020 | [1908.09756](https://arxiv.org/abs/1908.09756) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2020/5-8-DPQ/overview.md) |
+| 9 | **ROBE**: Random Offset Block Embedding — 1000x | 2021 | [2108.02191](https://arxiv.org/abs/2108.02191) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2021/5-9-ROBE/overview.md) |
+| 10 | Learnable Embedding Sizes for Rec Systems | 2021 | [2101.07577](https://arxiv.org/abs/2101.07577) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2021/5-10-Learnable-Embedding-Sizes/overview.md) |
+| 11 | **TT-Rec**: Tensor Train Embedding (112-117x) | 2021 | [2101.11714](https://arxiv.org/abs/2101.11714) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2021/5-11-TT-Rec/overview.md) |
+| 12 | **Binary Code Hash Embedding** (1000x) | 2021 | [2109.02471](https://arxiv.org/abs/2109.02471) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2021/5-12-Binary-Code-Hash-Embedding/overview.md) |
+| 13 | **HET**: Scaling Huge Embedding via Cache-enabled Distributed | 2021 | [2112.07221](https://arxiv.org/abs/2112.07221) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2021/5-13-HET/overview.md) |
 | 14 | **PSS**: 10000x compressed DLRM (NeurIPS) | 2022 | [2207.10731](https://arxiv.org/abs/2207.10731) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2022/5-14-PSS-10000x-DLRM/overview.md) |
 | 15 | **OptEmbed**: Learning Optimal Embedding Table | 2022 | [2208.04482](https://arxiv.org/abs/2208.04482) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2022/5-15-OptEmbed/overview.md) |
 | 16 | Data Leakage via Access Patterns of Sparse Features | 2022 | [2212.06264](https://arxiv.org/abs/2212.06264) | [📄](nhom-5-nen-embedding-va-nen-mo-hinh/2022/5-16-Data-Leakage/overview.md) |
