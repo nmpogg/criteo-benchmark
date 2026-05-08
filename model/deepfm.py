@@ -53,5 +53,5 @@ class DeepFM(nn.Module):
             
         deep_out = self.deep_net(deep_in)
         
-        # Trả về LOGITS
-        return fm_1st + fm_2nd + deep_out
+        out = fm_1st + fm_2nd + deep_out
+        return out.squeeze(1)

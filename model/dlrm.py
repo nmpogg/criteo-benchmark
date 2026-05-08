@@ -57,4 +57,4 @@ class DLRM(nn.Module):
         
         # 5. Đi qua Top MLP
         out = self.top_mlp(concat_x)
-        return out
+        return  out.squeeze(1)

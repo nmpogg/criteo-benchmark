@@ -54,6 +54,11 @@ class DCN(nn.Module):
         cross_out = self.cross_net(x0)
         deep_out = self.deep_net(x0)
         
-        # Nối đầu ra và đưa qua hàm sigmoid
+        # Nối đầu ra
         combined = torch.cat([cross_out, deep_out], dim=1)
-        return torch.sigmoid(self.fc(combined))
+        
+        # Đi qua lớp Linear cuối cùng để lấy logits
+        out = self.fc(combined)
+        
+        # Ép về 1D (bỏ sigmoid) để tương thích với BCEWithLogitsLoss
+        return out.squeeze(1)
