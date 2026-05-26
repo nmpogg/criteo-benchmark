@@ -1,0 +1,18 @@
+apiVersion: 1
+
+datasources:
+  - name: CTR PostgreSQL
+    uid: ctr-postgres
+    type: postgres
+    access: proxy
+    url: postgres:5432
+    user: ctr_user
+    secureJsonData:
+      password: ctr_pass
+    jsonData:
+      database: ctr_db
+      sslmode: disable
+      postgresVersion: 1500
+      timescaledb: false
+    isDefault: true
+    editable: true
