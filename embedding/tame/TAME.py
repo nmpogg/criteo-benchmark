@@ -22,7 +22,7 @@ class TAME_Embedding(nn.Module):
                     padding_idx=0
                 )
 
-    def forward(self, grouped_inputs):
+    def forward(self, grouped_inputs): #dict of {dim_str: [Batch, 26]}
         final_output = 0 
         
         for dim in self.supported_dims:

@@ -18,8 +18,8 @@ class MixedDimensionEmbedding(nn.Module):
             # 1. Tính số chiều tỷ lệ NGHỊCH với vocab_size (chuẩn theo paper Facebook)
             raw_dim = base_dim * ((v_min / float(vocab_size)) ** alpha)
             
-            # Làm tròn về lũy thừa của 2 gần nhất (1, 2, 4, 8, 16, 32, 64)
-            dim = max(1, 2 ** round(math.log2(max(raw_dim, 1e-9))))
+            # Làm tròn về lũy thừa của 2 gần nhất (2, 4, 8, 16, 32, 64)
+            dim = max(2, 2 ** round(math.log2(max(raw_dim, 1e-9))))
             dim = min(dim, base_dim)
             emb_dim = int(dim)
             
@@ -61,4 +61,6 @@ mde = MixedDimensionEmbedding(
     base_dim=64,
     alpha=0.5
 )
+
+mde()
 
