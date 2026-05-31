@@ -7,8 +7,10 @@ from pyspark.sql import SparkSession
 from model_client import (
     DEFAULT_MODEL_URL,
     DEFAULT_MODEL_VERSION,
+    DEFAULT_PREDICTION_EVENTS_PATH,
     DEFAULT_POSTGRES_DSN,
     DEFAULT_PROCESSED_FEATURES_PATH,
+    DEFAULT_RAW_EVENTS_PATH,
     predict_and_persist_micro_batch,
     predict_micro_batch,
 )
@@ -97,6 +99,22 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--raw-events-path",
+        default=DEFAULT_RAW_EVENTS_PATH,
+        help=(
+            "Bronze Data Lake path for raw Kafka events when using lake-model-postgres. "
+            f"Default: {DEFAULT_RAW_EVENTS_PATH}"
+        ),
+    )
+    parser.add_argument(
+        "--prediction-events-path",
+        default=DEFAULT_PREDICTION_EVENTS_PATH,
+        help=(
+            "Gold Data Lake path for prediction events when using lake-model-postgres. "
+            f"Default: {DEFAULT_PREDICTION_EVENTS_PATH}"
+        ),
+    )
+    parser.add_argument(
         "--postgres-dsn",
         default=DEFAULT_POSTGRES_DSN,
         help="PostgreSQL DSN used when writing predictions.",
@@ -160,7 +178,9 @@ def main() -> None:
                     predict_and_persist_micro_batch,
                     model_url=args.model_url,
                     model_batch_size=args.model_batch_size,
+                    raw_events_path=args.raw_events_path,
                     processed_features_path=args.processed_features_path,
+                    prediction_events_path=args.prediction_events_path,
                     postgres_dsn=args.postgres_dsn,
                     model_version=args.model_version,
                 )
