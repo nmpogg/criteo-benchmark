@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess
 import sys
 import threading
 import time
@@ -28,9 +29,20 @@ DEFAULT_POSTGRES_DSN = os.environ.get(
     "dbname=ctr_db user=ctr_user password=ctr_pass host=127.0.0.1 port=5433",
 )
 DEFAULT_MODEL_VERSION = os.environ.get("CTR_MODEL_VERSION", "DCN_DHE_best")
+RAW_EVENTS_PATH = PROJECT_ROOT / "data/lake/raw_events"
 PROCESSED_FEATURES_PATH = PROJECT_ROOT / "data/lake/processed_features"
+PREDICTION_EVENTS_PATH = PROJECT_ROOT / "data/lake/predictions"
+DATALAKE_SYNC_SCRIPT = PROJECT_ROOT / "scripts/sync_lake_to_hdfs_hive.sh"
+HIVE_PUBLISH_SCRIPT = PROJECT_ROOT / "scripts/publish_hive_batch_to_postgres.py"
+HDFS_LAKE_ROOT = "/user/ctr/lake"
+HDFS_UI_URL = "http://127.0.0.1:9870"
+HIVE_JDBC_URL = "jdbc:hive2://localhost:10000/ctr_lake"
+HIVE_DBEAVER_HINT = "DBeaver Hive: localhost:10000, database ctr_lake, auth none"
+GRAFANA_BATCH_URL = "http://127.0.0.1:3000/d/ctr-batch-lake/ctr-batch-data-lake-reports"
 DOWNSTREAM_MONITOR_TIMEOUT_SECONDS = int(os.environ.get("CTR_DEMO_MONITOR_TIMEOUT_SECONDS", "120"))
 DOWNSTREAM_MONITOR_INTERVAL_SECONDS = float(os.environ.get("CTR_DEMO_MONITOR_INTERVAL_SECONDS", "2"))
+AUTO_SYNC_DATALAKE = os.environ.get("CTR_DEMO_AUTO_SYNC_DATALAKE", "1") != "0"
+DATALAKE_COMMAND_TIMEOUT_SECONDS = int(os.environ.get("CTR_DEMO_DATALAKE_COMMAND_TIMEOUT_SECONDS", "300"))
 
 sys.path.insert(0, str(PRODUCER_DIR))
 sys.path.insert(0, str(SPARK_DIR))
@@ -47,8 +59,11 @@ STAGE_DEFINITIONS = [
     ("kafka", "Kafka Topic", "ctr_events"),
     ("spark", "Spark Streaming", "Consume Kafka + clean features"),
     ("model", "Model Service", "Called by Spark"),
-    ("data_lake", "Data Lake", "Written by Spark"),
+    ("data_lake", "Local Data Lake", "Bronze/Silver/Gold parquet"),
+    ("hdfs", "HDFS", "/user/ctr/lake"),
+    ("hive", "Hive", "External tables + partitions"),
     ("postgres", "PostgreSQL", "Predictions"),
+    ("batch_report", "Batch Reports", "Hive summary -> PostgreSQL"),
     ("dashboard", "Web/Grafana", "Read PostgreSQL"),
 ]
 
@@ -104,6 +119,10 @@ def create_run(
             "send_rate_eps": None,
             "processed_events": 0,
             "lake_rows": 0,
+            "raw_lake_files": 0,
+            "processed_lake_files": 0,
+            "prediction_lake_files": 0,
+            "hdfs_zones": 0,
             "model_batches": 0,
             "predictions": 0,
             "postgres_rows": 0,
@@ -195,6 +214,99 @@ def sample_events(path: Path, limit: int, run_id: str | None = None) -> list[dic
             if len(events) >= limit:
                 return events
     return events
+
+
+def count_parquet_files(path: Path) -> int:
+    if not path.exists():
+        return 0
+    return sum(1 for item in path.rglob("*.parquet") if item.is_file())
+
+
+def update_lake_file_metrics(run_id: str) -> dict[str, int]:
+    counts = {
+        "raw_lake_files": count_parquet_files(RAW_EVENTS_PATH),
+        "processed_lake_files": count_parquet_files(PROCESSED_FEATURES_PATH),
+        "prediction_lake_files": count_parquet_files(PREDICTION_EVENTS_PATH),
+    }
+    mutate_run(run_id, lambda run: run["metrics"].update(counts))
+    return counts
+
+
+def command_summary(completed: subprocess.CompletedProcess[str], max_lines: int = 18) -> str:
+    output = "\n".join(
+        line
+        for text in (completed.stdout, completed.stderr)
+        for line in text.splitlines()
+        if line.strip()
+    )
+    lines = output.splitlines()
+    return "\n".join(lines[-max_lines:]) if lines else "(no output)"
+
+
+def run_command(command: list[str]) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        command,
+        cwd=PROJECT_ROOT,
+        capture_output=True,
+        text=True,
+        timeout=DATALAKE_COMMAND_TIMEOUT_SECONDS,
+        check=True,
+    )
+
+
+def sync_datalake_to_hdfs_hive(run_id: str) -> None:
+    if not AUTO_SYNC_DATALAKE:
+        set_stage(run_id, "hdfs", "skipped", "CTR_DEMO_AUTO_SYNC_DATALAKE=0")
+        set_stage(run_id, "hive", "skipped", "Auto sync disabled")
+        set_stage(run_id, "batch_report", "skipped", "Auto batch publish disabled")
+        return
+
+    lake_counts = update_lake_file_metrics(run_id)
+    set_stage(
+        run_id,
+        "data_lake",
+        "done",
+        (
+            f"local parquet raw={lake_counts['raw_lake_files']}, "
+            f"silver={lake_counts['processed_lake_files']}, "
+            f"gold={lake_counts['prediction_lake_files']}"
+        ),
+    )
+
+    if not DATALAKE_SYNC_SCRIPT.exists():
+        raise FileNotFoundError(f"Missing Data Lake sync script: {DATALAKE_SYNC_SCRIPT}")
+
+    set_stage(run_id, "hdfs", "running", f"Syncing local lake to {HDFS_LAKE_ROOT}")
+    set_stage(run_id, "hive", "pending", "Waiting for HDFS sync")
+    log(run_id, "Syncing local Data Lake parquet files to HDFS and repairing Hive partitions")
+    completed = run_command(["bash", str(DATALAKE_SYNC_SCRIPT)])
+    log(run_id, "HDFS/Hive sync finished:\n" + command_summary(completed))
+    mutate_run(run_id, lambda run: run["metrics"].update({"hdfs_zones": 3}))
+    set_stage(run_id, "hdfs", "done", f"Browse in NameNode UI: {HDFS_UI_URL}")
+    set_stage(run_id, "hive", "done", f"Query with {HIVE_DBEAVER_HINT}")
+
+    if not HIVE_PUBLISH_SCRIPT.exists():
+        set_stage(run_id, "batch_report", "skipped", "Hive publish script missing")
+        return
+
+    set_stage(run_id, "batch_report", "running", "Publishing Hive daily/hourly summary to PostgreSQL")
+    log(run_id, "Running Hive batch aggregation and publishing summary tables for Grafana")
+    try:
+        completed = run_command(
+            [
+                sys.executable,
+                str(HIVE_PUBLISH_SCRIPT),
+                "--postgres-dsn",
+                DEFAULT_POSTGRES_DSN,
+            ]
+        )
+    except subprocess.CalledProcessError as exc:
+        log(run_id, "Hive batch publish failed:\n" + command_summary(exc))
+        set_stage(run_id, "batch_report", "error", "Hive summary publish did not finish")
+        return
+
+    log(run_id, "Hive batch publish finished:\n" + command_summary(completed))
+    set_stage(run_id, "batch_report", "done", f"Grafana batch dashboard: {GRAFANA_BATCH_URL}")
 
 
 def send_prebuilt_events_to_kafka(
@@ -334,14 +446,27 @@ def update_downstream_monitoring(
     if prediction_count == 0:
         set_stage(run_id, "spark", "running", "Waiting for Spark to consume Kafka")
         set_stage(run_id, "model", "pending", "Spark will call model service")
-        set_stage(run_id, "data_lake", "pending", "Spark will write processed features")
+        set_stage(run_id, "data_lake", "pending", "Spark will write bronze/silver/gold parquet")
+        set_stage(run_id, "hdfs", "pending", "Waiting for local Data Lake output")
+        set_stage(run_id, "hive", "pending", "Waiting for HDFS sync")
         set_stage(run_id, "postgres", "pending", "Waiting for predictions")
+        set_stage(run_id, "batch_report", "pending", "Waiting for Hive tables")
     else:
+        lake_counts = update_lake_file_metrics(run_id)
         detail = f"{prediction_count:,}/{expected_events:,} predictions visible in PostgreSQL"
         stage_status = "done" if is_complete else "running"
         set_stage(run_id, "spark", stage_status, detail)
         set_stage(run_id, "model", stage_status, detail)
-        set_stage(run_id, "data_lake", stage_status, "Spark sink should write processed features before prediction")
+        set_stage(
+            run_id,
+            "data_lake",
+            stage_status,
+            (
+                f"local parquet raw={lake_counts['raw_lake_files']}, "
+                f"silver={lake_counts['processed_lake_files']}, "
+                f"gold={lake_counts['prediction_lake_files']}"
+            ),
+        )
         set_stage(run_id, "postgres", stage_status, detail)
 
     if is_complete:
@@ -456,7 +581,10 @@ def run_pipeline(run_id: str, uploaded_path: Path) -> None:
             set_stage(run_id, "spark", "skipped", "No Kafka events for Spark")
             set_stage(run_id, "model", "skipped", "Spark did not receive this run")
             set_stage(run_id, "data_lake", "skipped", "Spark did not receive this run")
+            set_stage(run_id, "hdfs", "skipped", "No new Data Lake output")
+            set_stage(run_id, "hive", "skipped", "No new Data Lake output")
             set_stage(run_id, "postgres", "skipped", "No downstream predictions")
+            set_stage(run_id, "batch_report", "skipped", "No downstream predictions")
             set_stage(run_id, "dashboard", "done", "Ingestion-only run finished")
             log(run_id, "Kafka send skipped")
 
@@ -506,6 +634,15 @@ def run_pipeline(run_id: str, uploaded_path: Path) -> None:
                     "Check that Spark realtime job and model service are running.",
                 )
 
+            if prediction_count > 0:
+                try:
+                    sync_datalake_to_hdfs_hive(run_id)
+                except Exception as exc:
+                    set_stage(run_id, "hdfs", "error", str(exc))
+                    set_stage(run_id, "hive", "error", "Data Lake sync did not finish")
+                    set_stage(run_id, "batch_report", "error", "Hive summary publish did not finish")
+                    log(run_id, f"Data Lake HDFS/Hive sync failed: {exc}")
+
         def finish(run: dict[str, Any]) -> None:
             has_errors = any(stage["status"] == "error" for stage in run["stages"].values())
             has_running = any(stage["status"] == "running" for stage in run["stages"].values())
@@ -536,7 +673,15 @@ def health() -> dict[str, Any]:
         "kafka_topic": DEFAULT_TOPIC,
         "model_url": DEFAULT_MODEL_URL,
         "postgres_dsn": DEFAULT_POSTGRES_DSN,
+        "raw_events_path": str(RAW_EVENTS_PATH),
         "processed_features_path": str(PROCESSED_FEATURES_PATH),
+        "prediction_events_path": str(PREDICTION_EVENTS_PATH),
+        "hdfs_lake_root": HDFS_LAKE_ROOT,
+        "hdfs_ui_url": HDFS_UI_URL,
+        "hive_jdbc_url": HIVE_JDBC_URL,
+        "hive_dbeaver_hint": HIVE_DBEAVER_HINT,
+        "grafana_batch_url": GRAFANA_BATCH_URL,
+        "auto_sync_datalake": AUTO_SYNC_DATALAKE,
     }
 
 

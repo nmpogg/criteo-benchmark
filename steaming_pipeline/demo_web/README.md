@@ -33,5 +33,6 @@ Lưu ý:
 ```text
 FastAPI không tự clean feature, không tự gọi model, không tự ghi PostgreSQL.
 Spark Structured Streaming mới là nơi đọc Kafka, clean feature, gọi model,
-ghi data/lake/processed_features và ghi PostgreSQL.
+ghi data/lake/raw_events, data/lake/processed_features, data/lake/predictions
+và ghi PostgreSQL.
 ```

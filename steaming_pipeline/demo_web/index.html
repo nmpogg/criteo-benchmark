@@ -452,7 +452,7 @@
     <aside class="sidebar">
       <div class="brand">
         <div class="brand-title">CTR Streaming Live Demo</div>
-        <div class="brand-subtitle">Upload · Kafka · Spark · Model · Monitoring</div>
+        <div class="brand-subtitle">Upload · Kafka · Spark · HDFS · Hive</div>
       </div>
 
       <div class="side-status">
@@ -472,18 +472,20 @@
 
       <div class="runbook" style="margin-top: 24px;">
         <strong style="color: #e5edf7;">Cần chạy trước</strong>
-        <span>1. `docker compose up -d`</span>
-        <span>2. Bật model service ở port 8000.</span>
-        <span>3. Bật Spark realtime job với sink `lake-model-postgres`.</span>
-        <span>4. Dashboard này chạy qua `uvicorn demo_api.app:app --host 127.0.0.1 --port 9000`.</span>
-      </div>
+          <span>1. `docker compose up -d`</span>
+          <span>2. Bật model service ở port 8000.</span>
+          <span>3. Bật Spark realtime job với sink `lake-model-postgres`.</span>
+          <span>4. Dashboard này chạy qua `uvicorn demo_api.app:app --host 127.0.0.1 --port 9000`.</span>
+          <span>HDFS UI: http://127.0.0.1:9870</span>
+          <span>Hive/DBeaver: jdbc:hive2://localhost:10000/ctr_lake</span>
+        </div>
     </aside>
 
     <main class="main">
       <div class="topbar">
         <div>
           <h1>Demo động cho pipeline CTR Streaming</h1>
-          <p class="lead">Upload một file Parquet, FastAPI lưu vào `data/uploads`, tạo JSON event theo số lượng bạn chọn và gửi vào Kafka. Spark realtime job là nơi đọc Kafka, xử lý feature, gọi model, ghi Data Lake/PostgreSQL. Web này theo dõi trạng thái gửi và output trong PostgreSQL.</p>
+          <p class="lead">Upload một file Parquet, FastAPI lưu vào `data/uploads`, tạo JSON event theo số lượng bạn chọn và gửi vào Kafka. Spark realtime job đọc Kafka, xử lý feature, gọi model, ghi local Data Lake/PostgreSQL. Sau khi có prediction, demo tự sync lake lên HDFS, repair Hive table và publish batch summary cho Grafana.</p>
         </div>
         <span id="runStatus" class="status-pill pending"><span class="dot"></span>idle</span>
       </div>
@@ -554,6 +556,26 @@
             <div class="metric-label">Lake rows</div>
             <div class="metric-value" id="metricLakeRows">-</div>
             <div class="metric-note">inferred from Spark sink</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Bronze files</div>
+            <div class="metric-value" id="metricRawLakeFiles">-</div>
+            <div class="metric-note">data/lake/raw_events</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Silver files</div>
+            <div class="metric-value" id="metricProcessedLakeFiles">-</div>
+            <div class="metric-note">data/lake/processed_features</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Gold files</div>
+            <div class="metric-value" id="metricPredictionLakeFiles">-</div>
+            <div class="metric-note">data/lake/predictions</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">HDFS zones</div>
+            <div class="metric-value" id="metricHdfsZones">-</div>
+            <div class="metric-note">raw/silver/gold synced</div>
           </div>
           <div class="metric">
             <div class="metric-label">Predictions</div>
@@ -653,7 +675,10 @@
       "spark",
       "model",
       "data_lake",
+      "hdfs",
+      "hive",
       "postgres",
+      "batch_report",
       "dashboard"
     ];
 
@@ -665,8 +690,11 @@
       kafka: { name: "Kafka Topic", description: "ctr_events", status: "pending", detail: "" },
       spark: { name: "Spark Streaming", description: "Consume Kafka + clean features", status: "pending", detail: "" },
       model: { name: "Model Service", description: "Called by Spark", status: "pending", detail: "" },
-      data_lake: { name: "Data Lake", description: "processed features", status: "pending", detail: "" },
+      data_lake: { name: "Local Data Lake", description: "Bronze/Silver/Gold parquet", status: "pending", detail: "" },
+      hdfs: { name: "HDFS", description: "/user/ctr/lake", status: "pending", detail: "" },
+      hive: { name: "Hive", description: "External tables + partitions", status: "pending", detail: "" },
       postgres: { name: "PostgreSQL", description: "predictions", status: "pending", detail: "" },
+      batch_report: { name: "Batch Reports", description: "Hive summary -> PostgreSQL", status: "pending", detail: "" },
       dashboard: { name: "Web/Grafana", description: "read PostgreSQL", status: "pending", detail: "" }
     };
 
@@ -731,6 +759,10 @@
       document.getElementById("metricSendRate").textContent = metrics.send_rate_eps ? Number(metrics.send_rate_eps).toFixed(1) : "-";
       document.getElementById("metricProcessed").textContent = formatNumber(metrics.processed_events);
       document.getElementById("metricLakeRows").textContent = formatNumber(metrics.lake_rows);
+      document.getElementById("metricRawLakeFiles").textContent = formatNumber(metrics.raw_lake_files);
+      document.getElementById("metricProcessedLakeFiles").textContent = formatNumber(metrics.processed_lake_files);
+      document.getElementById("metricPredictionLakeFiles").textContent = formatNumber(metrics.prediction_lake_files);
+      document.getElementById("metricHdfsZones").textContent = formatNumber(metrics.hdfs_zones);
       document.getElementById("metricPredictions").textContent = formatNumber(metrics.predictions);
       document.getElementById("metricKafkaOffsets").textContent = formatNumber(metrics.kafka_offsets);
       document.getElementById("metricPostgresRows").textContent = formatNumber(metrics.postgres_rows);
